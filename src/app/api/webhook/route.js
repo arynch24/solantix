@@ -1,51 +1,36 @@
+import { Pool } from "pg";
+
+// Initialize PostgreSQL connection pool
+const pool = new Pool({
+  user: "your_db_user",
+  host: "your_db_host",
+  database: "your_db_name",
+  password: "your_db_password",
+  port: 5432,
+});
+
 export async function POST(request) {
-    try {
-        // Parse the request body
-        const body = await request.json();
+  try {
+    const body = await request.json();
+    console.log("Received Webhook Payload:", body);
 
-        // Log the entire payload
-        console.log("Webhook Payload:", JSON.stringify(body, null, 2));
-
-        // Specific logging for debugging
-        console.log("Received Webhook Event:", {
-            type: body.type,
-            timestamp: new Date().toISOString()
-        });
-
-        // Basic payload validation
-        if (!body) {
-            return Response.json(
-                { error: "Empty request body" }, 
-                { status: 400 }
-            );
-        }
-
-        // Process webhook event
-        // Add your specific logic to handle NFT bid events here
-
-        return Response.json(
-            { 
-                success: true,
-                receivedAt: new Date().toISOString()
-            }, 
-            { status: 200 }
-        );
-    } catch (error) {
-        console.error("Webhook Processing Error:", error);
-        return Response.json(
-            { 
-                error: "Internal Server Error",
-                details: error.message || 'Unknown error'
-            }, 
-            { status: 500 }
-        );
+    if (!body || body.type !== "NFT_BID") {
+      return Response.json({ error: "Invalid webhook payload" }, { status: 400 });
     }
-}
 
-// Optional: Handle other HTTP methods
-export async function GET() {
-    return Response.json(
-        { error: "Method Not Allowed" }, 
-        { status: 405 }
+    // Extract bid data
+    const { mint, bidder, amount, currency, marketplace } = body.data;
+    const timestamp = new Date(body.timestamp * 1000); // Convert Unix timestamp
+
+    // Store the bid in PostgreSQL
+    await pool.query(
+      "INSERT INTO nft_bids (nft_mint, bidder, amount, currency, marketplace, timestamp) VALUES ($1, $2, $3, $4, $5, $6)",
+      [mint, bidder, amount, currency, marketplace, timestamp]
     );
+
+    return Response.json({ success: true, message: "NFT bid recorded" }, { status: 200 });
+  } catch (error) {
+    console.error("Error handling webhook:", error);
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
