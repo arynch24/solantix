@@ -6,9 +6,18 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+
 export async function GET() {
   try {
     const client = await pool.connect();
+    console.log("Connected to PostgreSQL ✅");
+    client.release();
+  } catch (err) {
+    console.error("Failed to connect to PostgreSQL ❌", err);
+  }
+  
+  try {
+    // const client = await pool.connect();
     console.log("API: Fetching bids");
     const result = await client.query("SELECT * FROM nft_bids"); 
     client.release();
