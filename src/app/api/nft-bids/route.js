@@ -1,35 +1,34 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
 
-// Initialize PostgreSQL connection
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  max: 10, 
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000, 
 });
 
-
 export async function GET() {
+  let client;
   try {
-    const client = await pool.connect();
+    client = await pool.connect();
     console.log("Connected to PostgreSQL ✅");
-    client.release();
-  } catch (err) {
-    console.error("Failed to connect to PostgreSQL ❌", err);
-  }
-  
-  try {
-    // const client = await pool.connect();
-    console.log("API: Fetching bids");
-    const result = await client.query("SELECT * FROM nft_bids"); 
-    client.release();
 
-    return NextResponse.json(result.rows); // Return fetched data
+    console.log("API: Fetching bids");
+    const result = await client.query("SELECT * FROM nft_bids");
+
+    return NextResponse.json(result.rows);
   } catch (error) {
     console.error("Error fetching bids:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  } finally {
+    if (client) client.release();
   }
 }
 
 export async function POST(req) {
+  let client;
   try {
     const { bidder, amount, currency, nft_mint, marketplace } = await req.json();
 
@@ -38,16 +37,17 @@ export async function POST(req) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const client = await pool.connect();
+    client = await pool.connect();
     await client.query(
       "INSERT INTO nft_bids (bidder, amount, currency, nft_mint, marketplace) VALUES ($1, $2, $3, $4, $5)",
       [bidder, amount, currency, nft_mint, marketplace]
     );
-    client.release();
 
     return NextResponse.json({ message: "Bid added successfully" });
   } catch (error) {
     console.error("Error inserting bid:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  } finally {
+    if (client) client.release();
   }
 }
