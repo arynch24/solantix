@@ -1,45 +1,57 @@
 "use client";
 import { useEffect, useState } from "react";
 
-export default function NFTBids() {
+export default function BidList() {
   const [bids, setBids] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchNFTBids = async () => {
-      const res = await fetch("/api/nft-bids");
-      const data = await res.json();
-      setBids(data);
-    };
-    fetchNFTBids();
+    async function fetchBids() {
+      try {
+        const response = await fetch("/api/nft-bids");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch bids");
+        }
+
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid data format received");
+        }
+
+        setBids(data);
+      } catch (error) {
+        console.error("Error fetching bids:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBids();
   }, []);
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold">NFT Bids</h1>
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border p-2">NFT Mint</th>
-            <th className="border p-2">Bidder</th>
-            <th className="border p-2">Amount</th>
-            <th className="border p-2">Currency</th>
-            <th className="border p-2">Marketplace</th>
-            <th className="border p-2">Timestamp</th>
-          </tr>
-        </thead>
-        <tbody>
-          {bids.map((bid) => (
-            <tr key={bid.id}>
-              <td className="border p-2">{bid.nft_mint}</td>
-              <td className="border p-2">{bid.bidder}</td>
-              <td className="border p-2">{bid.amount}</td>
-              <td className="border p-2">{bid.currency}</td>
-              <td className="border p-2">{bid.marketplace}</td>
-              <td className="border p-2">{new Date(bid.timestamp).toLocaleString()}</td>
-            </tr>
+      <h1 className="text-2xl font-bold mb-4">NFT Bids</h1>
+      {loading && <p>Loading...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+      {!loading && !error && bids.length === 0 && <p>No bids available.</p>}
+      {!loading && !error && bids.length > 0 && (
+        <ul className="space-y-2">
+          {bids.map((bid, index) => (
+            <li key={index} className="p-2 border-b bg-gray-100 rounded">
+              <p className="font-semibold">{bid.bidder}</p>
+              <p>
+                Bid <span className="font-bold">{bid.amount}</span> {bid.currency} on{" "}
+                <span className="text-blue-600">{bid.nft_mint}</span>
+              </p>
+              <p className="text-gray-500 text-sm">Marketplace: {bid.marketplace}</p>
+            </li>
           ))}
-        </tbody>
-      </table>
+        </ul>
+      )}
     </div>
   );
 }
