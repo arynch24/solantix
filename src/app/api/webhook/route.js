@@ -1,54 +1,28 @@
-export default async function handler(req, res) {
-  if (req.method === "POST") {
-    const { transactions } = req.body;
+export async function POST(req) {
+  try {
+      const body = await req.json();
+      console.log("🚀 Webhook Data Received:", JSON.stringify(body, null, 2));
 
-    if (transactions && transactions.length > 0) {
-      transactions.forEach((tx) => {
-        const { signature, type, nftTransfers } = tx;
+      body.forEach(transaction => {
+          console.log(`🔹 Transaction Type: ${transaction.type}`);
+          console.log(`🔹 Signature: ${transaction.signature}`);
+          console.log(`🔹 Accounts: ${transaction.accounts}`);
 
-        console.log(`🔹 New Transaction Detected! Type: ${type}`);
-
-        if (nftTransfers && nftTransfers.length > 0) {
-          nftTransfers.forEach((nft) => {
-            const { mint, fromUserAccount, toUserAccount, amount, currency } = nft;
-
-            switch (type) {
-              case "NFT_BID":
-                console.log("🎯 NFT Bid Detected!");
-                console.log(`🖼 NFT Mint Address: ${mint}`);
-                console.log(`🏦 Bidder: ${toUserAccount}`);
-                console.log(`💰 Bid Amount: ${amount} ${currency}`);
-                break;
-
-              case "NFT_LISTING":
-                console.log("🛒 NFT Listing Detected!");
-                console.log(`🖼 NFT Mint Address: ${mint}`);
-                console.log(`📤 Seller: ${fromUserAccount}`);
-                console.log(`💰 Listed Price: ${amount} ${currency}`);
-                break;
-
-              case "NFT_SALE":
-                console.log("💸 NFT Sale Detected!");
-                console.log(`🖼 NFT Mint Address: ${mint}`);
-                console.log(`📤 Seller: ${fromUserAccount}`);
-                console.log(`📥 Buyer: ${toUserAccount}`);
-                console.log(`💰 Sale Price: ${amount} ${currency}`);
-                break;
-
-              default:
-                console.log("⚠️ Unknown transaction type detected.");
-                break;
-            }
-
-            console.log(`🔗 Transaction Signature: ${signature}`);
-            console.log("--------------------------------");
-          });
-        }
+          if (transaction.type === "NFT_BID") {
+              console.log("🎯 Processing NFT Bid:", transaction);
+              // Add logic for handling NFT Bids
+          } else if (transaction.type === "NFT_LISTING") {
+              console.log("📢 Processing NFT Listing:", transaction);
+              // Add logic for handling NFT Listings
+          } else if (transaction.type === "NFT_SALE") {
+              console.log("💰 Processing NFT Sale:", transaction);
+              // Add logic for handling NFT Sales
+          }
       });
-    }
 
-    res.status(200).json({ message: "Webhook received successfully" });
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
+  } catch (error) {
+      console.error("❌ Webhook Error:", error);
+      return new Response(JSON.stringify({ error: "Webhook processing failed" }), { status: 500 });
   }
 }
