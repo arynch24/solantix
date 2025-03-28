@@ -1,7 +1,8 @@
 export async function POST(req) {
   try {
     const body = await req.json();
-    console.log("🚀 Webhook Data Received:", JSON.stringify(body, null, 2));
+    // console.log("🚀 Webhook Data Received:", JSON.stringify(body, null, 2));
+    console.log("🚀 Webhook Data Received:");
 
     body.forEach(transaction => {
       console.log(`🔹 Transaction Type: ${transaction.type}`);
