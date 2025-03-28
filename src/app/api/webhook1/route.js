@@ -58,6 +58,7 @@ export async function POST(req) {
 
         return new Response(JSON.stringify({ success: true }), { status: 200 });
     } catch (error) {
-        console.log(`[Error] error message : ${error.message}`)
+        console.error("❌ Webhook Error:", error);
+        return new Response(JSON.stringify({ error: "Webhook processing failed" }), { status: 500 });
     }
 }
