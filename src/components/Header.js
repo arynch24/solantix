@@ -10,6 +10,14 @@ export default function Header() {
   const { data: session } = useSession();
   const router = useRouter();
 
+  const handleDashboardClick = () => {
+    if (session) {
+      router.push("/dashboard");
+    } else {
+      router.push("/api/auth/signin");
+    }
+  };
+
   return (
     <header className="w-full px-6 py-4 pt-6 bg-background border-b">
       <div className="container mx-auto flex items-center justify-between">
@@ -20,8 +28,8 @@ export default function Header() {
 
         {/* Right-side buttons */}
         <div className="hidden md:flex items-center space-x-4">
-          <Button asChild>
-            <Link href="/get-credentials">Get Postgres Credentials</Link>
+          <Button onClick={handleDashboardClick}>
+            Dashboard
           </Button>
           {session ? (
             <Button

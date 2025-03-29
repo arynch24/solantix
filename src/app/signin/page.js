@@ -8,14 +8,13 @@ export default function SignInPage() {
       <div className="w-1/3 flex flex-col gap-2 min-w-md items-start justify-between bg-white rounded-3xl px-8 py-12 shadow-2xl">
         {/* Logo */}
         <div className="text-3xl font-bold flex items-center">
-          <p className="text-black">upload</p>
-          <p className="text-[#E91616]">thing</p>
+          <p className="text-black">solantix</p>
         </div>
 
         {/* Heading */}
         <h2 className="text-xl font-bold pt-5 ">Sign in</h2>
         <p className="text-gray-500 pb-5">
-          to continue to <span className="font-bold">uploadthing</span>
+          to continue to <span className="font-bold">solantix dashboard</span>
         </p>
 
         {/* Custom Sign In Button */}

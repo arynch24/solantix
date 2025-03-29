@@ -10,10 +10,11 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import Profile from "@/components/Dashboard/Profile"; 
+import Profile from "@/components/Dashboard/Profile";
+import { useSession, signOut } from "next-auth/react";
 
 export default function DemoSidebar() {
-    const [selectedPage, setSelectedPage] = useState("dashboard"); 
+    const [selectedPage, setSelectedPage] = useState("dashboard");
 
     const links = [
         { label: "Dashboard", key: "dashboard", icon: <IconBrandTabler className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" /> },
@@ -68,6 +69,7 @@ export default function DemoSidebar() {
                 {selectedPage === "dashboard" && <Dashboard />}
                 {selectedPage === "profile" && <Profile />}
                 {/* {selectedPage === "settings" && <Settings />} */}
+                {selectedPage === "logout" && <Logout />}
             </div>
         </div>
     );
@@ -95,6 +97,17 @@ const Dashboard = () => (
                 ))}
             </div>
         </div>
+    </div>
+);
+
+const Logout = () => (
+    <div className="flex flex-1 flex-col items-center justify-center">
+        <h1 className="text-xl font-semibold text-gray-900">Logout</h1>
+        <p className="text-gray-700">Are you sure you want to logout?</p>
+        <button className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md" onClick={async () => {
+            await signOut({ redirect: false });
+            window.location.href = "/"; 
+        }}>Logout</button>
     </div>
 );
 
