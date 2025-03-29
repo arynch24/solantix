@@ -12,8 +12,18 @@ export const authOptions = {
     signIn: "/signin", // Custom sign-in page
   },
   callbacks: {
+    async jwt({ token, user, account, profile }) {
+      if (account?.provider === "github") {
+        token.username = profile?.login; 
+        token.avatar = profile?.avatar_url; 
+      }
+      return token;
+    },
+
     async session({ session, token }) {
-      session.user.id = token.sub;
+      session.user.id = token.sub; // GitHub ID
+      session.user.username = token.username; // GitHub Username
+      session.user.image = token.avatar; // GitHub Avatar
       return session;
     },
   },
