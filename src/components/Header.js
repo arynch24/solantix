@@ -3,8 +3,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
   return (
     <header className="w-full px-6 py-4 pt-6 bg-background border-b">
       <div className="container mx-auto flex items-center justify-between">
@@ -18,9 +23,21 @@ export default function Header() {
           <Button asChild>
             <Link href="/get-credentials">Get Postgres Credentials</Link>
           </Button>
-          <Button variant="outline" asChild>
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
+          {session ? (
+            <Button
+              variant="outline"
+              onClick={() => {
+                signOut();
+                router.push("/");
+              }}
+            >
+              Sign Out
+            </Button>
+          ) : (
+            <Button variant="outline" onClick={() => router.push("/signin")}>
+              Sign In
+            </Button>
+          )}
         </div>
 
         {/* Mobile Menu */}
@@ -34,9 +51,21 @@ export default function Header() {
             <Button asChild>
               <Link href="/get-credentials">Get Postgres Credentials</Link>
             </Button>
-            <Button variant="outline" asChild>
-              <Link href="/sign-in">Sign In</Link>
-            </Button>
+            {session ? (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  signOut();
+                  router.push("/");
+                }}
+              >
+                Sign Out
+              </Button>
+            ) : (
+              <Button variant="outline" onClick={() => router.push("/signin")}>
+                Sign In
+              </Button>
+            )}
           </SheetContent>
         </Sheet>
       </div>
