@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import Profile from "@/components/Dashboard/Profile";
 import { useSession, signOut } from "next-auth/react";
 import Dashboard from "@/components/Dashboard/MainDashboard";
-
+import Analytics from "@/components/Dashboard/Analytics";
 export default function DemoSidebar() {
     const [selectedPage, setSelectedPage] = useState("dashboard");
 
@@ -69,7 +69,7 @@ export default function DemoSidebar() {
             <div className="flex flex-1">
                 {selectedPage === "dashboard" && <Dashboard />}
                 {selectedPage === "profile" && <Profile />}
-                {/* {selectedPage === "settings" && <Settings />} */}
+                {selectedPage === "settings" && <Analytics />}
                 {selectedPage === "logout" && <Logout />}
             </div>
         </div>

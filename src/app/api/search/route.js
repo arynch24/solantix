@@ -49,6 +49,7 @@ export async function GET(req) {
             currentSupply: asset.supply?.print_current_supply || "N/A",
             royalty: asset.royalty?.percent ? `${asset.royalty.percent * 100}%` : "0%",
             primarySale: asset.royalty?.primary_sale_happened ? "Yes" : "No",
+            price: asset.royalty?.price || "N/A",
         });
     } catch (error) {
         console.error("Error fetching data:", error);
