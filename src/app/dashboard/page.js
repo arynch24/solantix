@@ -37,7 +37,7 @@ export default function DemoSidebar() {
                                     onClick={() => setSelectedPage(link.key)}
                                     className={cn(
                                         "flex items-center gap-3 w-full p-2 rounded-md text-neutral-700 dark:text-neutral-200 hover:bg-gray-200 dark:hover:bg-neutral-700",
-                                        selectedPage === link.key ? "bg-gray-300 dark:bg-neutral-600" : ""
+                                        selectedPage === link.key ? "bg-gray-300  dark:bg-neutral-600" : ""
                                     )}
                                 >
                                     {link.icon}
@@ -77,7 +77,7 @@ export default function DemoSidebar() {
 
 export const Logo = () => (
     <Link href="/" className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black">
-        <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" />
+        <div className="h-5 w-7 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" />
         <span className="font-medium whitespace-pre text-black dark:text-white">Solantix</span>
     </Link>
 );
