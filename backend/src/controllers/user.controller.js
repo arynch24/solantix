@@ -56,7 +56,12 @@ const addCredentials = asyncHandler(async (req, res) => {
             port: postgresConfig.port,
             user: postgresConfig.user,
             password: postgresConfig.password,
-            database: "postgres", // Use the default 'postgres' database for connection testing
+            database: "postgres", // Use the default 'postgres' database for connection testing,
+            family: 4,
+            connectionTimeoutMillis: 10000,
+            ssl: {
+                rejectUnauthorized: false // You might want to make this configurable
+            }
         };
 
         const pool = new Pool(postgresConfigWithoutDB);
