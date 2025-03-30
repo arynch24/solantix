@@ -1,0 +1,1 @@
+export const indexingCategories = ["NFT_BIDS", "NFT_PRICES", "TOKEN_PRICES", "TOKEN_LOANS"];
