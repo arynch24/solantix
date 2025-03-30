@@ -3,10 +3,18 @@ import fs from "fs";
 import { User } from '../models/user.model.js';
 import pkg from "pg";
 
+// Services
+import { databaseService } from '../services/database.service.js';
+import {cacheService} from '../services/cache.service.js';
+import { batchService } from '../services/batch.service.js';
+
 const { Pool } = pkg;
 
 const processNftPrices = asyncHandler(async (req, res) => {
     console.log('[Info] Processing NFT prices webhook');
+
+    res.status(200).json({ message: 'Webhook received successfully' });
+
 
     const { body } = req;
     const type = body[0].type;
@@ -30,16 +38,8 @@ const processNftPrices = asyncHandler(async (req, res) => {
     buyer_address =  body[0]?.events?.nft?.buyer;
     price_amount =  (body[0]?.events?.nft?.amount || 0) / 1000000000;
 
-    try {
-        let collectionName = await fetch(`https://api-mainnet.magiceden.dev/v2/tokens/${nft_address}`, {
-            headers: { "Content-Type": "application/json" }
-        });
-        collectionName = await collectionName.json();
-        nft_collection = collectionName?.name;
-    } catch (error) {
-        console.error(`[Error] Failed to fetch collection name for NFT address ${nft_address}:`, error.message);
-        nft_collection = "Unknown Collection"; // Fallback value
-    }
+    // Get collection name from cache or API
+    nft_collection = await cacheService.getNftCollection(nft_address);
 
 
     if (type === "NFT_LISTING") {
@@ -49,28 +49,47 @@ const processNftPrices = asyncHandler(async (req, res) => {
         marketplace = body[0]?.events?.nft?.source;
     }
 
+    // Prepare data object to be added to buffer
+    const nftPriceData = {
+        transaction_id,
+        transaction_type,
+        nft_address,
+        nft_collection,
+        seller_address,
+        buyer_address,
+        price_amount,
+        marketplace
+    };
+
+
 
     
 
     console.log('[Info] Users found for NFT_PRICES category:', users.length);
 
     // Iterate through each user and save the data to their respective database
-    for (const user of users) {
-        const postgresConfig = user.postgresConfig;
-        const pool = new Pool(postgresConfig);
+    // for (const user of users) {
+    //     const postgresConfig = user.postgresConfig;
+    //     const pool = new Pool(postgresConfig);
 
-        try {
-            // Insert the data into the user's database
-            await pool.query(
-                `INSERT INTO nft_prices (transaction_id, transaction_type, nft_address, nft_collection, seller_address, buyer_address, price_amount, marketplace) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-                [transaction_id, transaction_type, nft_address, nft_collection, seller_address, buyer_address, price_amount, marketplace]
-            );
-            console.log(`[Info] Data saved successfully for user ${user.githubId}`);
-        } catch (error) {
-            console.error(`[Error] Failed to save data for user ${user.githubId}:`, error.message);
-        } finally {
-            await pool.end(); // Close the connection pool
-        }
+    //     try {
+    //         // Insert the data into the user's database
+    //         await pool.query(
+    //             `INSERT INTO nft_prices (transaction_id, transaction_type, nft_address, nft_collection, seller_address, buyer_address, price_amount, marketplace) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    //             [transaction_id, transaction_type, nft_address, nft_collection, seller_address, buyer_address, price_amount, marketplace]
+    //         );
+    //         console.log(`[Info] Data saved successfully for user ${user.githubId}`);
+    //     } catch (error) {
+    //         console.error(`[Error] Failed to save data for user ${user.githubId}:`, error.message);
+    //     } finally {
+    //         await pool.end(); // Close the connection pool
+    //     }
+    // }
+
+    
+    console.log(`[Info] Adding data to buffers for ${users.length} users`);
+    for (const user of users) {
+      batchService.addToBuffer(user.githubId, "NFT_PRICES", nftPriceData);
     }
 
     console.log('[Info] NFT prices webhook processed successfully');
