@@ -7,6 +7,8 @@ let createdWebhooks = {};
 let categoryMap = {
     "NFT_PRICES": "nft-prices",
     "NFT_BIDS": "nft-bids",
+    "TOKEN_PRICES": "token-prices",
+    "TOKEN_LOANS": "token-loans",
 };
 
 
@@ -25,8 +27,11 @@ async function initializeWebhooks() {
     for (const [category, config] of webhookCategories) {
         console.log(`[Info] Creating webhook for category: ${category}`);
         try {
+
+            const apiKey = config?.authHeader?.split(" ")[1];
+            
             // Check if webhook already exists
-            const existingWebhook = await checkWebhookExists(categoryMap[category]);  // remaining
+            const existingWebhook = await checkWebhookExists(categoryMap[category], apiKey);  // remaining
             
             if (existingWebhook) {
                 console.log(`[Message] Webhook for category ${category} already exists, skipping creation`);
@@ -35,7 +40,7 @@ async function initializeWebhooks() {
             }
             
             // Create the webhook
-            const webhook = await createHeliusWebhook(config);
+            const webhook = await createHeliusWebhook(config, apiKey);
             createdWebhooks[category] = webhook;
             console.log(webhook);
             
@@ -53,37 +58,41 @@ async function initializeWebhooks() {
 /**
  * Create a new webhook with Helius
  */
-async function createHeliusWebhook(config) {
-    console.log("[Info] Creating webhook");
+async function createHeliusWebhook(config, apiKey) {
+    try {
+        console.log("[Info] Creating webhook");
+        
+      
     
-  
-
-    const response = await fetch(`https://api.helius.xyz/v0/webhooks?api-key=${process.env.HELIUS_API_KEY}`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(
-            config
-        )
-    });
-    
-    const data = await response.json();
-    
-    
-    console.log("[Info] Helius webhook created successfully");
-    
-    return data;
+        const response = await fetch(`https://api.helius.xyz/v0/webhooks?api-key=${apiKey}`, {
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(
+                config
+            )
+        });
+        
+        const data = await response.json();
+        
+        
+        console.log("[Info] Helius webhook created successfully");
+        
+        return data;
+    } catch (error) {
+        console.error('Error creating webhook:', error.message);
+        return null;
+    }
 }
 
 /**
  * Check if a webhook already exists for a category
  */
-async function checkWebhookExists(category) {
+async function checkWebhookExists(category, apiKey) {
     try {
-        
         const response = await axios.get('https://api.helius.xyz/v0/webhooks', {
-            params: { "api-key": process.env.HELIUS_API_KEY }
+            params: { "api-key": apiKey }
         });
         
      
@@ -91,10 +100,9 @@ async function checkWebhookExists(category) {
         return response.data.find(webhook =>
             webhook.webhookURL.includes(`/webhook/${category.toLowerCase()}`)
         );
-        return null;
     } catch (error) {
         console.error('Error checking existing webhooks:', error.message);
-        return null;
+        throw error;
     }
 }
 

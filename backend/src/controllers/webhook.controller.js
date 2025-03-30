@@ -14,6 +14,12 @@ const processNftPrices = asyncHandler(async (req, res) => {
     if (!type || type !== "NFT_LISTING" && type !== "NFT_SALE") {
         return res.status(400).json({ message: 'Unknown webhook data' });
     }
+    // Retrieve all the users from the database whose indexingCategories include "NFT_PRICES"
+    const users = await User.find({ indexingCategories: "NFT_PRICES" });
+    if (!users || users.length === 0) {
+        console.log('[Error] No users found for NFT_PRICES category');
+        return;
+    }
 
     let transaction_id, transaction_type, nft_address, nft_collection, seller_address, buyer_address, price_amount, marketplace;
 
@@ -44,12 +50,7 @@ const processNftPrices = asyncHandler(async (req, res) => {
     }
 
 
-    // Retrieve all the users from the database whose indexingCategories include "NFT_PRICES"
-    const users = await User.find({ indexingCategories: "NFT_PRICES" });
-    if (!users || users.length === 0) {
-        console.log('[Error] No users found for NFT_PRICES category');
-        return;
-    }
+    
 
     console.log('[Info] Users found for NFT_PRICES category:', users.length);
 
@@ -72,14 +73,48 @@ const processNftPrices = asyncHandler(async (req, res) => {
         }
     }
 
-    console.log('[Info] NFT prices webhook processed successfully');    
-    
-    // fs.appendFile('logs/webhook_responses.log', jsonData + '\n', (err) => {
-    //     if (err) console.error('Error saving webhook response:', err);
-    // });
+    console.log('[Info] NFT prices webhook processed successfully');
     res.status(200).json({ message: 'Webhook received successfully' });
 });
 
+
+/**
+ * 
+*/
+const processNftBids = asyncHandler(async (req, res) => {
+    const { body } = req;
+    const jsonData = JSON.stringify(body, null, 2);
+    console.log('[Info] Processing NFT bids webhook');
+    
+    fs.appendFile('logs/nft_bids.log', jsonData + ',\n', (err) => {
+        if (err) console.error('Error saving webhook response:', err);
+    });
+});
+
+const processTokenPrices = asyncHandler(async (req, res) => {
+    const { body } = req;
+    const jsonData = JSON.stringify(body, null, 2);
+    console.log("[Info] processing token prices webhook");
+
+    fs.appendFile('logs/token_prices.log', jsonData + ',\n', (err) => {
+        if (err) console.error('Error saving webhook response:', err);
+    });
+})
+
+const processTokenLoans = asyncHandler(async (req, res) => {
+    const { body } = req;
+    const jsonData = JSON.stringify(body, null, 2);
+    console.log("[Info] processing token loans webhook");
+
+    fs.appendFile('logs/token_loans.log', jsonData + ',\n', (err) => {
+        if (err) console.error('Error saving webhook response:', err);
+    });
+})
 export {
-    processNftPrices
+    processNftPrices,
+    processNftBids,
+    processTokenPrices, 
+    processTokenLoans
 };
+
+
