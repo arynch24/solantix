@@ -1,5 +1,5 @@
 import pkg from "pg";
-import User from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 
 const { Pool } = pkg;
 class DatabaseService {

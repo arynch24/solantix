@@ -32,7 +32,7 @@ class BatchService {
 
     addToBuffer(userId, category, data) {
         const bufferKey = `${userId}_${category}`;
-
+        
         // Create buffer if it doesn't exist
         if (!this.buffers[bufferKey]) {
             this.setupBufferForUser(userId, category);
@@ -87,13 +87,14 @@ class BatchService {
     }
 
     async flushNftPrices(userId, dataToFlush) {
+        console.log(`[Debug] Flushing ${dataToFlush.length} NFT price records for user ${userId}`);
         await databaseService.executeTransaction(userId, async (client) => {
             const query = `
-        INSERT INTO nft_prices 
-        (transaction_id, transaction_type, nft_address, nft_collection, 
-         seller_address, buyer_address, price_amount, marketplace) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      `;
+            INSERT INTO nft_prices 
+            (transaction_id, transaction_type, nft_address, nft_collection, 
+            seller_address, buyer_address, price_amount, marketplace) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `;
 
             for (const item of dataToFlush) {
                 await client.query(query, [
