@@ -91,6 +91,8 @@ async function createHeliusWebhook(config, apiKey) {
  */
 async function checkWebhookExists(category, apiKey) {
     try {
+        console.log(apiKey);
+        
         const response = await axios.get('https://api.helius.xyz/v0/webhooks', {
             params: { "api-key": apiKey }
         });
@@ -102,7 +104,7 @@ async function checkWebhookExists(category, apiKey) {
         );
     } catch (error) {
         console.error('Error checking existing webhooks:', error.message);
-        throw error;
+        return null;
     }
 }
 

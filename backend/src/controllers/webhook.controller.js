@@ -3,12 +3,21 @@ import fs from "fs";
 import { User } from '../models/user.model.js';
 import pkg from "pg";
 
+// Services
+// import { databaseService } from '../services/database.service.js';
+import {cacheService} from '../services/cache.service.js';
+// import { batchService } from '../services/batch.service.js';
+
 const { Pool } = pkg;
 
 const processNftPrices = asyncHandler(async (req, res) => {
     console.log('[Info] Processing NFT prices webhook');
 
+    // res.status(200).json({ message: 'Webhook received successfully' });
+
+
     const { body } = req;
+    
     const type = body[0].type;
 
     if (!type || type !== "NFT_LISTING" && type !== "NFT_SALE") {
@@ -30,16 +39,8 @@ const processNftPrices = asyncHandler(async (req, res) => {
     buyer_address =  body[0]?.events?.nft?.buyer;
     price_amount =  (body[0]?.events?.nft?.amount || 0) / 1000000000;
 
-    try {
-        let collectionName = await fetch(`https://api-mainnet.magiceden.dev/v2/tokens/${nft_address}`, {
-            headers: { "Content-Type": "application/json" }
-        });
-        collectionName = await collectionName.json();
-        nft_collection = collectionName?.name;
-    } catch (error) {
-        console.error(`[Error] Failed to fetch collection name for NFT address ${nft_address}:`, error.message);
-        nft_collection = "Unknown Collection"; // Fallback value
-    }
+    // Get collection name from cache or API
+    nft_collection = await cacheService.getNftCollection(nft_address);
 
 
     if (type === "NFT_LISTING") {
@@ -48,6 +49,19 @@ const processNftPrices = asyncHandler(async (req, res) => {
     else if (type === "NFT_SALE") {
         marketplace = body[0]?.events?.nft?.source;
     }
+
+    // Prepare data object to be added to buffer
+    // const nftPriceData = {
+    //     transaction_id,
+    //     transaction_type,
+    //     nft_address,
+    //     nft_collection,
+    //     seller_address,
+    //     buyer_address,
+    //     price_amount,
+    //     marketplace
+    // };
+
 
 
     
@@ -72,6 +86,12 @@ const processNftPrices = asyncHandler(async (req, res) => {
             await pool.end(); // Close the connection pool
         }
     }
+
+    
+    console.log(`[Info] Adding data to buffers for ${users.length} users`);
+    // for (const user of users) {
+    //   batchService.addToBuffer(user.githubId, "NFT_PRICES", nftPriceData);
+    // }
 
     console.log('[Info] NFT prices webhook processed successfully');
     res.status(200).json({ message: 'Webhook received successfully' });
