@@ -24,8 +24,14 @@ app.use(express.json({
 // Routing
 import userRoute from "./routes/user.route.js";
 import webhookRoute from "./routes/webhook.route.js";
+import fetchDataRoute from "./routes/fetchData.route.js";
 
+// Webhook route
 app.use("/api/webhook", webhookRoute);
+
+// User route
 app.use("/api/user", userRoute);
 
+// Api for giving data to the frontend for dashboard
+app.use("/api/fetchData", fetchDataRoute);
 export default app;
