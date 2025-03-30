@@ -53,7 +53,7 @@ const LandingPage = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Simply provide your Postgres credentials and we'll handle the rest. Your data stays in your control while we manage the indexing.
+                  Simply provide your Postgres credentials and we&apos;ll handle the rest. Your data stays in your control while we manage the indexing.
                 </p>
               </CardContent>
             </Card>
