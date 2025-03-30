@@ -5,9 +5,9 @@ import { Search, CornerDownLeft } from "lucide-react";
 import NFTTable from './NFTTable';
 
 const defaultNFT = {
-  name: "Loading...",
-  description: "Fetching NFT data...",
-  image: "/placeholder.png",
+  name: "Unknown NFT",
+  description: "N/A",
+  image: "https://artlogic-res.cloudinary.com/w_1200,c_limit,f_auto,fl_lossy,q_auto/ws-artlogicwebsite0889/usr/images/news/main_image/6/nft-bored-ape-yacht-club.png",
   mintAddress: "N/A",
   owner: "N/A",
   collection: "N/A",
@@ -47,7 +47,7 @@ const ProductAnalyticsDashboard = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">NFT Analytics</h1>
-          <p className="text-gray-500">Navigating Data for Informed Product Decisions</p>
+         
         </div>
 
         <div className="flex items-center space-x-2">
@@ -84,7 +84,7 @@ const ProductAnalyticsDashboard = () => {
       </div>
 
       {/* NFT Display Section */}
-      <div className="flex justify-between">
+      <div className="flex justify-between border-y-[0.5px] border-gray-500 py-4">
         <div className='flex w-1/2 gap-6'>
           {/* NFT Image with Skeleton Loader */}
           <div className="flex justify-center">
@@ -117,9 +117,12 @@ const ProductAnalyticsDashboard = () => {
             </p>
           </div>
         </div>
+        <div className='h-48 bg-gray-500 w-[0.5px] mr-12'>
+
+        </div>
 
         {/* Additional Info with Skeleton Loader */}
-        <div className="mt-4 text-sm pr-10 space-y-2">
+        <div className="mt-4 text-sm pr-10 space-y-2 ">
           <p><strong>Mint Address:</strong> {loading ? <div className="inline-block w-32 h-4 bg-gray-300 animate-pulse rounded-md"></div> : nftData?.mintAddress}</p>
           <p><strong>Owner:</strong> {loading ? <div className="inline-block w-24 h-4 bg-gray-300 animate-pulse rounded-md"></div> : nftData?.owner}</p>
           <p><strong>Collection:</strong> {loading ? <div className="inline-block w-24 h-4 bg-gray-300 animate-pulse rounded-md"></div> : nftData?.collection}</p>

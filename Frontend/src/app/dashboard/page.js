@@ -45,7 +45,7 @@ export default function DemoSidebar() {
                             ))}
                         </div>
                     </div>
-                    <SidebarLink
+                    {/* <SidebarLink
                         link={{
                             label: "Manu Arora",
                             href: "#",
@@ -59,7 +59,7 @@ export default function DemoSidebar() {
                                 />
                             ),
                         }}
-                    />
+                    /> */}
                 </SidebarBody>
             </Sidebar>
 

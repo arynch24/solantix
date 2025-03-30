@@ -35,11 +35,31 @@ export default function Profile() {
     }));
   };
 
-  const handleSave = () => {
-    console.log("Updated User Data:", userData);
-    alert("Profile Updated Successfully!");
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const response = await fetch("/addCredentials", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to update profile");
+      }
+
+      console.log("✅ Profile Updated:", result);
+      alert("Profile Updated Successfully!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("❌ Error Updating Profile:", error);
+      alert("Failed to update profile. Please try again.");
+    }
   };
+
 
   return (
     <Card className="w-full mx-auto p-6 h-full overflow-y-auto bg-white shadow-md rounded-lg">

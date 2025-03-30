@@ -36,8 +36,9 @@ const ProductAnalyticsDashboard = ({ mintAddress }) => {
         const fetchTableData = async () => {
             setTableLoading(true);
             try {
-                const response = await fetch(`https://ef28-203-92-62-90.ngrok-free.app/api/fetchData/getNftData?githubId=${githubId}&nftAddress=${mintAddress}&category=${activeTab}`);
-                
+
+                const response = await fetch(`https://solantix-services.up.railway.app/api/fetchData/getNftData?githubId=${githubId}&nftAddress=${mintAddress}&category=${activeTab}`);
+
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
                 const { data } = await response.json();
