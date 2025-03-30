@@ -37,7 +37,7 @@ export default function Profile() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch("/addCredentials", {
+      const response = await fetch("https://solantix-services.up.railway.app/api/user/addCredentials", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
