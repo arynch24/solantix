@@ -1,16 +1,32 @@
-import { useState } from "react";
+import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Search, CornerDownLeft } from "lucide-react";
+import NFTTable from './NFTTable';
 
-export default function Dashboard() {
+const defaultNFT = {
+  name: "Unknown NFT",
+  description: "N/A",
+  image: "https://artlogic-res.cloudinary.com/w_1200,c_limit,f_auto,fl_lossy,q_auto/ws-artlogicwebsite0889/usr/images/news/main_image/6/nft-bored-ape-yacht-club.png",
+  mintAddress: "N/A",
+  owner: "N/A",
+  collection: "N/A",
+  royalty: "N/A",
+  primarySale: "N/A",
+};
+
+const ProductAnalyticsDashboard = () => {
   const [mintAddress, setMintAddress] = useState("");
-  const [nftData, setNftData] = useState(null);
+  const [nftData, setNftData] = useState(defaultNFT);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchNFTDetails = async () => {
+    setMintAddress("");
     if (!mintAddress) return;
     setLoading(true);
     setError(null);
-    setNftData(null);
+    setNftData(defaultNFT);
 
     try {
       const response = await fetch(`/api/search?mint=${mintAddress}`);
@@ -20,91 +36,107 @@ export default function Dashboard() {
       console.log("🔍 Frontend Received Data:", data);
     } catch (err) {
       setError("NFT not found or invalid address");
+      setNftData(defaultNFT);
     }
-
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-900 text-white p-6 flex flex-col items-center overflow-y-auto">
-      <h1 className="text-3xl font-bold mb-6">NFT Dashboard</h1>
+    <div className="flex flex-col w-full max-w-6xl mx-auto p-4 space-y-6 overflow-y-auto">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">NFT Analytics</h1>
+         
+        </div>
 
-      {/* Search Bar */}
-      <div className="flex gap-2 mb-6">
-        <input
-          type="text"
-          placeholder="Enter Mint Address"
-          value={mintAddress}
-          onChange={(e) => setMintAddress(e.target.value)}
-          className="p-2 border border-gray-700 bg-gray-800 text-white rounded-md w-96"
-        />
-        <button
-          onClick={fetchNFTDetails}
-          className="p-2 bg-blue-600 hover:bg-blue-700 rounded-md"
-        >
-          Search
-        </button>
+        <div className="flex items-center space-x-2">
+          {/* Search Input */}
+          <div className="relative w-96">
+            <Input
+              type="text"
+              placeholder="Enter Mint Address"
+              value={mintAddress}
+              onChange={(e) => setMintAddress(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && fetchNFTDetails()} // Execute on Enter key
+              className="pl-8 pr-8" // Added padding for right icon space
+            />
+
+            {/* Search Icon (Left) */}
+            <Search
+              onClick={fetchNFTDetails}
+              className="absolute left-2 top-2.5 h-4 w-4 text-gray-500 cursor-pointer hover:text-gray-300"
+            />
+
+            {/* Enter Icon (Right) */}
+            <CornerDownLeft
+              onClick={fetchNFTDetails}
+              className="absolute right-1.5 top-1.5 h-6 w-6 text-gray-500 cursor-pointer 
+             transition-colors duration-200 ease-in-out 
+             hover:bg-blue-500 hover:text-white p-1 rounded-sm"
+            />
+
+
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+          </div>
+        </div>
+
       </div>
 
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-
-      {nftData && (
-        <div className="bg-gray-800 p-6 rounded-lg w-full max-w-2xl shadow-lg">
-          {/* NFT Image */}
+      {/* NFT Display Section */}
+      <div className="flex justify-between border-y-[0.5px] border-gray-500 py-4">
+        <div className='flex w-1/2 gap-6'>
+          {/* NFT Image with Skeleton Loader */}
           <div className="flex justify-center">
-            <img
-              src={nftData.image}
-              alt="NFT"
-              className="w-64 h-64 object-cover rounded-lg mb-4"
-            />
+            {loading ? (
+              <div className="w-44 h-44 bg-gray-300 animate-pulse rounded-lg" />
+            ) : (
+              <img
+                src={nftData?.image}
+                alt="NFT"
+                className="w-44 h-44 object-cover rounded-lg mb-4"
+              />
+            )}
           </div>
 
           {/* NFT Details */}
-          <h2 className="text-2xl font-bold mb-2">
-            {nftData.name || "Unknown NFT"}
-          </h2>
-          <p className="text-gray-400">{nftData.description}</p>
-
-          {/* Additional Info */}
-          <div className="mt-4 text-sm space-y-2">
-            <p><strong>Mint Address:</strong> {nftData.mintAddress}</p>
-            <p><strong>Owner:</strong> {nftData.owner || "N/A"}</p>
-            <p><strong>Collection:</strong> {nftData.collection || "N/A"}</p>
-            <p><strong>Royalty:</strong> {nftData.royalty }</p>
-            <p><strong>Primary Sale:</strong> {nftData.primarySale}</p>
+          <div>
+            <h2 className="text-2xl font-bold mb-2">
+              {loading ? (
+                <div className="w-32 h-6 bg-gray-300 animate-pulse rounded-md"></div>
+              ) : (
+                nftData?.name || "Unknown NFT"
+              )}
+            </h2>
+            <p className="text-gray-400">
+              {loading ? (
+                <div className="w-48 h-4 bg-gray-300 animate-pulse rounded-md"></div>
+              ) : (
+                nftData?.description
+              )}
+            </p>
           </div>
-
-          {/* NFT Attributes */}
-          {nftData.attributes && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-2">Attributes</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {nftData.attributes.map((attr, index) => (
-                  <div key={index} className="p-2 bg-gray-700 rounded-md text-center">
-                    <p className="text-sm text-gray-300">{attr.trait_type}</p>
-                    <p className="font-semibold">{attr.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* External Link */}
-          {nftData.externalUrl && (
-            <div className="mt-4">
-              <a
-                href={nftData.externalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:underline"
-              >
-                View on Official Site
-              </a>
-            </div>
-          )}
         </div>
-      )}
+        <div className='h-48 bg-gray-500 w-[0.5px] mr-12'>
+
+        </div>
+
+        {/* Additional Info with Skeleton Loader */}
+        <div className="mt-4 text-sm pr-10 space-y-2 ">
+          <p><strong>Mint Address:</strong> {loading ? <div className="inline-block w-32 h-4 bg-gray-300 animate-pulse rounded-md"></div> : nftData?.mintAddress}</p>
+          <p><strong>Owner:</strong> {loading ? <div className="inline-block w-24 h-4 bg-gray-300 animate-pulse rounded-md"></div> : nftData?.owner}</p>
+          <p><strong>Collection:</strong> {loading ? <div className="inline-block w-24 h-4 bg-gray-300 animate-pulse rounded-md"></div> : nftData?.collection}</p>
+          <p><strong>Royalty:</strong> {loading ? <div className="inline-block w-16 h-4 bg-gray-300 animate-pulse rounded-md"></div> : nftData?.royalty}</p>
+          <p><strong>Primary Sale:</strong> {loading ? <div className="inline-block w-16 h-4 bg-gray-300 animate-pulse rounded-md"></div> : nftData?.primarySale}</p>
+        </div>
+      </div>
+
+      {/* NFT Table */}
+      <div className="bg-white rounded-lg shadow">
+        <NFTTable mintAddress={mintAddress} />
+      </div>
     </div>
   );
-}
+};
+
+export default ProductAnalyticsDashboard;

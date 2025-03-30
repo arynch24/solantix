@@ -13,14 +13,12 @@ import { cn } from "@/lib/utils";
 import Profile from "@/components/Dashboard/Profile";
 import { useSession, signOut } from "next-auth/react";
 import Dashboard from "@/components/Dashboard/MainDashboard";
-import Analytics from "@/components/Dashboard/Analytics";
 export default function DemoSidebar() {
     const [selectedPage, setSelectedPage] = useState("dashboard");
 
     const links = [
         { label: "Dashboard", key: "dashboard", icon: <IconBrandTabler className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" /> },
         { label: "Profile", key: "profile", icon: <IconUserBolt className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" /> },
-        { label: "Settings", key: "settings", icon: <IconSettings className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" /> },
         { label: "Logout", key: "logout", icon: <IconArrowLeft className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" /> },
     ];
 
@@ -47,7 +45,7 @@ export default function DemoSidebar() {
                             ))}
                         </div>
                     </div>
-                    <SidebarLink
+                    {/* <SidebarLink
                         link={{
                             label: "Manu Arora",
                             href: "#",
@@ -61,7 +59,7 @@ export default function DemoSidebar() {
                                 />
                             ),
                         }}
-                    />
+                    /> */}
                 </SidebarBody>
             </Sidebar>
 
@@ -69,7 +67,6 @@ export default function DemoSidebar() {
             <div className="flex flex-1">
                 {selectedPage === "dashboard" && <Dashboard />}
                 {selectedPage === "profile" && <Profile />}
-                {selectedPage === "settings" && <Analytics />}
                 {selectedPage === "logout" && <Logout />}
             </div>
         </div>
