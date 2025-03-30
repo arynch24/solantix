@@ -14,7 +14,7 @@ export default function RootLayout({ children }) {
       <head>
         {/* <link rel="icon" type="image/png" href="/utlogo.png" /> */}
       </head>
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col w-full">
         <SessionProvider>
           {!hideHeaderFooter && <Header />}
           <main className="w-full flex-grow">{children}</main>

@@ -28,7 +28,7 @@ export default function Header() {
 
         {/* Right-side buttons */}
         <div className="hidden md:flex items-center space-x-4">
-          <Button onClick={handleDashboardClick}>
+          <Button className="bg-indigo-600" onClick={handleDashboardClick}>
             Dashboard
           </Button>
           {session ? (
