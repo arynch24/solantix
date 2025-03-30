@@ -19,7 +19,7 @@ const verifyCredentialsHelper = async (pool) => {
         client.release();
         return true;
     } catch (error) {
-        console.error("Error connecting to PostgreSQL:", error);
+        console.error("Error connecting to PostgreSQL:", error.message);
         return false;
     }
     // Removed pool.end() to prevent closing the pool prematurely
