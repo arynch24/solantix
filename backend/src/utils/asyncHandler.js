@@ -13,6 +13,7 @@ const asyncHandler = (requestHandler) => {
                 success: false,
                 message: error.message
             })
+            
         }
     }
 }
