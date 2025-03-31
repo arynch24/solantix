@@ -47,6 +47,8 @@ const addCredentials = asyncHandler(async (req, res) => {
                 $or: [{ githubId }, { name }, { email }]
             });
 
+            console.log("[Info] existedUser", existedUser);
+            
             if (existedUser) {
                 throw new ApiError(400, "User with githubId, email or name already exists");
             }
