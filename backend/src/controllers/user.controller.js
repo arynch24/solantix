@@ -31,11 +31,11 @@ const addCredentials = asyncHandler(async (req, res) => {
 
         const { githubId, name, email, postgresConfig, indexingCategories } = req.body;
         console.log(postgresConfig);
-        
+
         if (
             [githubId, email, name].some((field) => field?.trim() === "") ||
             !postgresConfig ||
-            indexingCategories?.length === 0 
+            indexingCategories?.length === 0
         ) {
             throw new ApiError(400, "All fields are required");
         }
@@ -48,7 +48,7 @@ const addCredentials = asyncHandler(async (req, res) => {
             });
 
             console.log("[Info] existedUser", existedUser);
-            
+
             if (existedUser) {
                 throw new ApiError(400, "User with githubId, email or name already exists");
             }
@@ -85,7 +85,7 @@ const addCredentials = asyncHandler(async (req, res) => {
             await client.query(`CREATE DATABASE ${postgresConfig.database}`);
         }
         client.release();
-    
+
         // Create new user
         const newUser = new User({
             githubId,
@@ -101,22 +101,24 @@ const addCredentials = asyncHandler(async (req, res) => {
         console.log("[Info] Creating schema");
 
         // Create necessary schema for user
-        indexingCategories.forEach((category) => {
-            
-            switch (category) {
-                case "NFT_PRICES":
-                    const result = createNftPricingSchema(new Pool(postgresConfig), githubId);
-                    if (!result) {
-                        console.error(`[Error] Failed to create schema for category: ${category} we'll retry later`);      
-                    }
-                    break;
-                // Add more cases for other categories as needed
-                default:
-                    console.log(`[Warning] No schema creation logic for category: ${category}`);
-            }
-            
-        });
-        
+        if (indexingCategories) {
+            indexingCategories.forEach((category) => {
+
+                switch (category) {
+                    case "NFT_PRICES":
+                        const result = createNftPricingSchema(new Pool(postgresConfig), githubId);
+                        if (!result) {
+                            console.error(`[Error] Failed to create schema for category: ${category} we'll retry later`);
+                        }
+                        break;
+                    // Add more cases for other categories as needed
+                    default:
+                        console.log(`[Warning] No schema creation logic for category: ${category}`);
+                }
+
+            });
+        }
+
         // Send response
         res.status(201).json(
             new ApiResponse(201, "User created successfully", newUser)
@@ -130,7 +132,7 @@ const addCredentials = asyncHandler(async (req, res) => {
 const verifyCredentials = asyncHandler(async (req, res) => {
     try {
         const { githubId } = req.params;
-        
+
         // find postgres config of the user by githubId
 
         const result = await User.findOne({
@@ -138,7 +140,7 @@ const verifyCredentials = asyncHandler(async (req, res) => {
         });
 
         console.log("[Info] result", result);
-        
+
         if (!result) {
             throw new ApiError(400, "User not found");
         }
