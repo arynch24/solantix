@@ -4,7 +4,7 @@ import cors from "cors";
 const app = express();
 app.use(
     cors({
-        origin: 'https://solantix.vercel.app/', // Frontend URL
+        origin: 'https://solantix.vercel.app', // Frontend URL
         methods: 'GET, POST, PUT, DELETE',
         allowedHeaders: 'Content-Type, Authorization',
         credentials: true // Allow cookies
